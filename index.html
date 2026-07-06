@@ -21,13 +21,13 @@
                     <p>Mengirim aduan anonim atau beridentitas serta mengecek progres dengan kode aduan.</p>
                     <span class="btn primary">Buka dashboard</span>
                 </a>
-                <a class="role-card" href="#" onclick="promptLogin('poltar', 'polisi-taruna.html'); return false;">
+                <a class="role-card" href="polisi-taruna.html">
                     <span class="role-icon">#</span>
                     <strong>Polisi Taruna</strong>
                     <p>Memantau antrian aduan, memperbarui status, dan memberikan feedback kepada pengadu.</p>
                     <span class="btn primary">Masuk terbatas</span>
                 </a>
-                <a class="role-card" href="#" onclick="promptLogin('pengasuh', 'pengasuh.html'); return false;">
+                <a class="role-card" href="pengasuh.html">
                     <span class="role-icon">=</span>
                     <strong>Pengasuh</strong>
                     <p>Melihat laporan dan tindak lanjut dari pengadu serta polisi taruna, lalu memberi catatan supervisi.</p>
@@ -36,23 +36,5 @@
             </div>
         </section>
     </main>
-    <script>
-        function promptLogin(role, url) {
-            let roleName = role === 'poltar' ? 'Polisi Taruna' : 'Pengasuh';
-            let correctPassword = role === 'poltar' ? 'Poltar@2026' : 'Pengasuh@2026';
-            
-            let password = prompt("Masukkan sandi untuk masuk sebagai " + roleName + ":");
-            
-            if (password === null) {
-                return; // User membatalkan login
-            }
-            
-            if (password === correctPassword) {
-                window.location.href = url;
-            } else {
-                alert("Sandi salah! Anda tidak memiliki akses.");
-            }
-        }
-    </script>
 </body>
 </html>

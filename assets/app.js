@@ -138,7 +138,7 @@ async function init() {
 }
 
 function guard(role) {
-  var pass = { polisi: 'POLTAR2026', pengasuh: 'PENGASUH2026' }[role];
+  var pass = { polisi: 'Poltar@2026', pengasuh: 'Pengasuh@2026' }[role];
   var key = 'role-ok-' + role;
   if (sessionStorage.getItem(key) === '1') {
     showProtected();
@@ -151,7 +151,7 @@ function guard(role) {
   app.classList.add('hidden');
   document.querySelector('#gateForm').addEventListener('submit', function (e) {
     e.preventDefault();
-    var input = document.querySelector('#accessCode').value.trim().toUpperCase();
+    var input = document.querySelector('#accessCode').value.trim();
     if (input === pass) {
       sessionStorage.setItem(key, '1');
       showProtected();
