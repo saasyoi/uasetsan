@@ -29,15 +29,8 @@ function body(event) {
 async function setup(sql) {
   await sql.query("CREATE TABLE IF NOT EXISTS reports (id TEXT PRIMARY KEY, identity_mode TEXT NOT NULL, reporter_name TEXT NOT NULL, contact TEXT NOT NULL, reporter_level TEXT NOT NULL, category TEXT NOT NULL, subject TEXT NOT NULL, location TEXT NOT NULL, incident_date DATE NOT NULL, urgency TEXT NOT NULL, description TEXT NOT NULL, evidence TEXT NOT NULL DEFAULT '-', status TEXT NOT NULL DEFAULT 'Baru', feedback TEXT NOT NULL DEFAULT 'Aduan sudah masuk dan menunggu verifikasi polisi taruna.', history JSONB NOT NULL DEFAULT '[]'::jsonb, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW())");
   await sql.query("CREATE TABLE IF NOT EXISTS mentor_notes (id BIGSERIAL PRIMARY KEY, report_id TEXT NOT NULL, note TEXT NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW())");
-  var count = await sql.query('SELECT COUNT(*)::int AS count FROM reports');
-  if (count[0].count === 0) {
-    var now = new Date().toISOString();
-    await sql.query('INSERT INTO reports (id, identity_mode, reporter_name, contact, reporter_level, category, subject, location, incident_date, urgency, description, evidence, status, feedback, history, created_at, updated_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15::jsonb,$16,$17), ($18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32::jsonb,$33,$34), ($35,$36,$37,$38,$39,$40,$41,$42,$43,$44,$45,$46,$47,$48,$49::jsonb,$50,$51) ON CONFLICT (id) DO NOTHING', [
-      'ASP-0626-1042','anonymous','Anonim','-','Tingkat 1','Penyalahgunaan wewenang','Kelompok pembinaan malam','Area asrama','2026-06-24','Tinggi','Pengadu menyampaikan adanya instruksi pembinaan tambahan di luar jadwal resmi dan tanpa pendampingan yang jelas.','Catatan waktu kegiatan dan saksi satu angkatan','Diproses','Laporan sudah diterima dan sedang diklarifikasi kepada pihak terkait.',JSON.stringify([{title:'Aduan diterima',body:'Sistem menerima laporan dari pengadu.',at:now},{title:'Diverifikasi',body:'Admin memeriksa kelengkapan kronologi dan bukti awal.',at:now},{title:'Diproses',body:'Klarifikasi awal dijadwalkan oleh urusan pembinaan mental kepribadian.',at:now}]),now,now,
-      'ASP-0627-0818','identified','Taruna Tingkat 2','kontak-tercatat','Tingkat 2','Verbal atau ucapan','Senior tingkat 4','Koridor kelas','2026-06-25','Sedang','Pengadu merasa arahan yang diberikan menggunakan kata-kata merendahkan dan tidak berkaitan dengan tujuan pembinaan.','Nama saksi tersedia pada admin','Butuh Klarifikasi','Admin membutuhkan tambahan waktu kejadian yang lebih spesifik.',JSON.stringify([{title:'Aduan diterima',body:'Sistem menerima laporan beridentitas.',at:now},{title:'Butuh Klarifikasi',body:'Admin meminta detail waktu dan saksi tambahan.',at:now}]),now,now,
-      'ASP-0628-1530','anonymous','Anonim','-','Tingkat 3','Psikologis','Pembinaan kelompok','Lapangan apel','2026-06-28','Rendah','Pengadu meminta peninjauan metode teguran yang dilakukan berulang dan berdampak pada kenyamanan beberapa taruna.','-','Baru','Menunggu verifikasi admin.',JSON.stringify([{title:'Aduan diterima',body:'Sistem menerima laporan anonim.',at:now}]),now,now
-    ]);
-  }
+  // var count = await sql.query('SELECT COUNT(*)::int AS count FROM reports');
+  // if (count[0].count === 0) { ... }
 }
 
 function mapReport(row, reveal = true) {

@@ -11,74 +11,7 @@ function entry(title, body) {
   };
 }
 
-var seedReports = [
-  {
-    id: 'ASP-0626-1042',
-    identityMode: 'anonymous',
-    reporterName: 'Anonim',
-    contact: '-',
-    reporterLevel: 'Tingkat 1',
-    category: 'Penyalahgunaan wewenang',
-    subject: 'Kelompok pembinaan malam',
-    location: 'Area asrama',
-    incidentDate: '2026-06-24',
-    urgency: 'Tinggi',
-    description: 'Pengadu menyampaikan adanya instruksi pembinaan tambahan di luar jadwal resmi dan tanpa pendampingan yang jelas.',
-    evidence: 'Catatan waktu kegiatan dan saksi satu angkatan',
-    status: 'Diproses',
-    feedback: 'Laporan sudah diterima dan sedang diklarifikasi kepada pihak terkait.',
-    createdAt: '2026-06-26T08:15:00.000Z',
-    updatedAt: '2026-06-27T10:45:00.000Z',
-    history: [
-      entry('Aduan diterima', 'Sistem menerima laporan dari pengadu.'),
-      entry('Diverifikasi', 'Admin memeriksa kelengkapan kronologi dan bukti awal.'),
-      entry('Diproses', 'Klarifikasi awal dijadwalkan oleh urusan pembinaan mental kepribadian.')
-    ]
-  },
-  {
-    id: 'ASP-0627-0818',
-    identityMode: 'identified',
-    reporterName: 'Taruna Tingkat 2',
-    contact: 'kontak-tercatat',
-    reporterLevel: 'Tingkat 2',
-    category: 'Verbal atau ucapan',
-    subject: 'Senior tingkat 4',
-    location: 'Koridor kelas',
-    incidentDate: '2026-06-25',
-    urgency: 'Sedang',
-    description: 'Pengadu merasa arahan yang diberikan menggunakan kata-kata merendahkan dan tidak berkaitan dengan tujuan pembinaan.',
-    evidence: 'Nama saksi tersedia pada admin',
-    status: 'Butuh Klarifikasi',
-    feedback: 'Admin membutuhkan tambahan waktu kejadian yang lebih spesifik.',
-    createdAt: '2026-06-27T03:18:00.000Z',
-    updatedAt: '2026-06-28T02:10:00.000Z',
-    history: [
-      entry('Aduan diterima', 'Sistem menerima laporan beridentitas.'),
-      entry('Butuh Klarifikasi', 'Admin meminta detail waktu dan saksi tambahan.')
-    ]
-  },
-  {
-    id: 'ASP-0628-1530',
-    identityMode: 'anonymous',
-    reporterName: 'Anonim',
-    contact: '-',
-    reporterLevel: 'Tingkat 3',
-    category: 'Psikologis',
-    subject: 'Pembinaan kelompok',
-    location: 'Lapangan apel',
-    incidentDate: '2026-06-28',
-    urgency: 'Rendah',
-    description: 'Pengadu meminta peninjauan metode teguran yang dilakukan berulang dan berdampak pada kenyamanan beberapa taruna.',
-    evidence: '-',
-    status: 'Baru',
-    feedback: 'Menunggu verifikasi admin.',
-    createdAt: '2026-06-28T08:30:00.000Z',
-    updatedAt: '2026-06-28T08:30:00.000Z',
-    history: [
-      entry('Aduan diterima', 'Sistem menerima laporan anonim.')
-    ]
-  }
-];
+var seedReports = [];
 
 function load(key, fallback) {
   try {
