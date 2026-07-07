@@ -71,9 +71,20 @@ async function init() {
 }
 
 function guard(role) {
-  var pass = { polisi: 'Poltar@2026', pengasuh: 'Pengasuh@2026' }[role];
+  var passes = { 
+    polisi: ['Poltar@2026', 'POLTAR2026'], 
+    pengasuh: ['Pengasuh@2026', 'PENGASUH2026'] 
+  }[role];
   var key = 'role-ok-' + role;
-  if (sessionStorage.getItem(key) === '1') {
+  
+  var isOk = false;
+  try {
+    isOk = sessionStorage.getItem(key) === '1';
+  } catch (e) {
+    console.warn(e);
+  }
+  
+  if (isOk) {
     showProtected();
     return;
   }
@@ -85,8 +96,12 @@ function guard(role) {
   document.querySelector('#gateForm').addEventListener('submit', function (e) {
     e.preventDefault();
     var input = document.querySelector('#accessCode').value.trim();
-    if (input === pass) {
-      sessionStorage.setItem(key, '1');
+    if (passes.indexOf(input) > -1) {
+      try {
+        sessionStorage.setItem(key, '1');
+      } catch (err) {
+        console.warn(err);
+      }
       showProtected();
       return;
     }
