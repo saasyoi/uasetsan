@@ -33,9 +33,25 @@ function saveNotes() {
   localStorage.setItem(noteKey, JSON.stringify(mentorNotes));
 }
 
-async function loadAllData() {
+async function loadAllData(role) {
+  if (role !== 'polisi' && role !== 'pengasuh') {
+    reports = load(storageKey, seedReports);
+    mentorNotes = [];
+    selectedReportId = reports[0] && reports[0].id;
+    return;
+  }
+
+  var token = '';
   try {
-    var reportsRes = await fetch('/api/reports');
+    token = sessionStorage.getItem('role-token-' + role) || '';
+  } catch (e) {
+    console.warn("sessionStorage not available", e);
+  }
+
+  var headers = { 'X-Access-Code': token };
+
+  try {
+    var reportsRes = await fetch('/api/reports', { headers: headers });
     if (!reportsRes.ok) throw new Error('API error status: ' + reportsRes.status);
     var reportsData = await reportsRes.json();
     reports = reportsData.reports;
@@ -47,7 +63,7 @@ async function loadAllData() {
   }
 
   try {
-    var notesRes = await fetch('/api/notes');
+    var notesRes = await fetch('/api/notes', { headers: headers });
     if (!notesRes.ok) throw new Error('API error status: ' + notesRes.status);
     var notesData = await notesRes.json();
     mentorNotes = notesData.notes;
@@ -60,9 +76,11 @@ async function loadAllData() {
 
 async function init() {
   var role = document.body.dataset.role;
-  if (role === 'polisi' || role === 'pengasuh') guard(role);
+  if (role === 'polisi' || role === 'pengasuh') {
+    if (!guard(role)) return;
+  }
   
-  await loadAllData();
+  await loadAllData(role);
   
   renderStats();
   if (role === 'pengadu') initPengadu();
@@ -84,13 +102,20 @@ function guard(role) {
     console.warn(e);
   }
   
-  if (isOk) {
-    showProtected();
-    return;
-  }
   var gate = document.querySelector('#gate');
   var app = document.querySelector('#protectedApp');
-  if (!gate || !app) return;
+
+  function showProtected() {
+    if (gate) gate.classList.add('hidden');
+    if (app) app.classList.remove('hidden');
+  }
+
+  if (isOk) {
+    showProtected();
+    return true;
+  }
+  
+  if (!gate || !app) return false;
   gate.classList.remove('hidden');
   app.classList.add('hidden');
   document.querySelector('#gateForm').addEventListener('submit', function (e) {
@@ -99,19 +124,21 @@ function guard(role) {
     if (passes.indexOf(input) > -1) {
       try {
         sessionStorage.setItem(key, '1');
-      } catch (err) {
-        console.warn(err);
-      }
+        sessionStorage.setItem('role-token-' + role, input);
+      } catch (err) {}
       showProtected();
+      
+      loadAllData(role).then(function() {
+        renderStats();
+        if (role === 'polisi') initPolisi();
+        if (role === 'pengasuh') initPengasuh();
+      });
       return;
     }
     document.querySelector('#gateError').textContent = 'Kode akses tidak sesuai.';
   });
 
-  function showProtected() {
-    gate.classList.add('hidden');
-    app.classList.remove('hidden');
-  }
+  return false;
 }
 
 function renderStats() {
@@ -315,9 +342,16 @@ async function updateReport(e) {
   var updatedReport;
   if (!isOfflineMode) {
     try {
+      var token = '';
+      try {
+        token = sessionStorage.getItem('role-token-polisi') || '';
+      } catch (err) {}
       var res = await fetch('/api/reports/' + encodeURIComponent(selectedReportId), {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-Access-Code': token
+        },
         body: JSON.stringify({
           status: data.status,
           feedback: data.feedback,
@@ -390,9 +424,16 @@ async function saveMentorNote(e) {
   var newNote;
   if (!isOfflineMode) {
     try {
+      var token = '';
+      try {
+        token = sessionStorage.getItem('role-token-pengasuh') || '';
+      } catch (err) {}
       var res = await fetch('/api/notes', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'X-Access-Code': token
+        },
         body: JSON.stringify({
           reportId: reportId,
           text: text

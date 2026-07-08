@@ -43,7 +43,7 @@ function mapReport(row, reveal = true) {
     category: row.category,
     subject: row.subject,
     location: row.location,
-    incidentDate: String(row.incident_date).slice(0, 10),
+    incidentDate: (row.incident_date instanceof Date ? row.incident_date.toISOString() : String(row.incident_date)).slice(0, 10),
     urgency: row.urgency,
     description: row.description,
     evidence: row.evidence,
@@ -64,6 +64,29 @@ function makeCode() {
   return 'ASP-' + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0') + '-' + Math.floor(1000 + Math.random() * 9000);
 }
 
+function verifyAccess(event, allowedRoles) {
+  var headers = event.headers || {};
+  var token = headers['x-access-code'] || headers['X-Access-Code'] || '';
+  if (!token) {
+    var auth = headers['authorization'] || headers['Authorization'] || '';
+    if (auth.toLowerCase().indexOf('bearer ') === 0) {
+      token = auth.slice(7).trim();
+    }
+  }
+  var passes = {
+    polisi: ['Poltar@2026', 'POLTAR2026'],
+    pengasuh: ['Pengasuh@2026', 'PENGASUH2026']
+  };
+  for (var i = 0; i < allowedRoles.length; i++) {
+    var role = allowedRoles[i];
+    var allowedPasses = passes[role] || [];
+    if (allowedPasses.indexOf(token) > -1) {
+      return true;
+    }
+  }
+  return false;
+}
+
 export async function handler(event) {
   try {
     var sql = getSql();
@@ -72,6 +95,7 @@ export async function handler(event) {
     var method = event.httpMethod;
     if (method === 'GET' && p[0] === 'health') return response({ ok: true });
     if (method === 'GET' && p[0] === 'reports' && p.length === 1) {
+      if (!verifyAccess(event, ['polisi', 'pengasuh'])) return response({ error: 'Unauthorized' }, 401);
       var rows = await sql.query('SELECT * FROM reports ORDER BY updated_at DESC');
       return response({ reports: rows.map(function(row) { return mapReport(row, true); }) });
     }
@@ -91,6 +115,7 @@ export async function handler(event) {
       return response({ report: mapReport(inserted[0], true) }, 201);
     }
     if (method === 'PATCH' && p[0] === 'reports' && p[1]) {
+      if (!verifyAccess(event, ['polisi'])) return response({ error: 'Unauthorized' }, 401);
       var update = body(event);
       var current = await sql.query('SELECT * FROM reports WHERE id = $1', [p[1]]);
       if (current.length === 0) return response({ error: 'Aduan tidak ditemukan.' }, 404);
@@ -102,10 +127,12 @@ export async function handler(event) {
       return response({ report: mapReport(updated[0], true) });
     }
     if (method === 'GET' && p[0] === 'notes') {
+      if (!verifyAccess(event, ['polisi', 'pengasuh'])) return response({ error: 'Unauthorized' }, 401);
       var notes = await sql.query('SELECT * FROM mentor_notes ORDER BY created_at DESC');
       return response({ notes: notes.map(mapNote) });
     }
     if (method === 'POST' && p[0] === 'notes') {
+      if (!verifyAccess(event, ['pengasuh'])) return response({ error: 'Unauthorized' }, 401);
       var noteData = body(event);
       var saved = await sql.query('INSERT INTO mentor_notes (report_id, note) VALUES ($1,$2) RETURNING *', [noteData.reportId, noteData.text]);
       return response({ note: mapNote(saved[0]) }, 201);
